@@ -1,0 +1,3101 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Windows.Forms;
+
+using System.Web;
+using System.Xml;
+using System.IO;
+using System.Net;
+
+using System.Threading;
+
+using System.Data.OleDb;
+using ProjectOh.Class;
+
+namespace ProjectOh.Forms
+{
+    public partial class am_f_main : Form
+    {
+
+
+        public bool Ltf;
+        public int Lcurrentcursor;
+        public int Ltotal = 50;
+
+        public int Ltotalcount = 0;
+
+        public DataTable Ldatatable;
+
+        public Worker_Unit[] Lworkerunit = new Worker_Unit[20];
+
+        public am_f_main()
+        {
+            InitializeComponent();
+        }
+
+        private void am_f_main_Load(object sender, EventArgs e)
+        {
+
+            ctl_web_openapi.ScriptErrorsSuppressed = true;
+            
+            ctl_naver_openapi_webbrowser.ScriptErrorsSuppressed = true;
+
+
+            for (int i=0 ;i < 20; i++)
+                Lworkerunit[i] = new Worker_Unit();
+
+
+        }
+
+        public Worker_Unit GET_Worker_Unit()
+        {
+            lock (Lworkerunit)
+            {
+                for (int i = 0; i < 20; i++)
+                {
+                    if (!Lworkerunit[i].Lusing) return Lworkerunit[i];
+                }
+
+
+            }
+
+            return null;
+
+        }
+
+
+        delegate void Display(WorkDataUnit p_data);
+        Display s;
+        public void set_xml(WorkDataUnit p_string)
+        {
+            try
+            {
+
+
+                if (this.InvokeRequired == true)
+                {
+                    //this.SET_Value_Rich(p_xml);
+                    s = new Display(SET_Value_Rich);
+                    //this.SET_Value_Rich(p_string);
+
+                    this.BeginInvoke(s, new object[] { p_string });
+
+                }
+                else
+                {
+
+                    this.SET_Value_Rich(p_string);
+
+                }
+
+            }
+            catch (Exception err)
+            {
+
+                //MessageBox.Show(err.ToString());
+
+            }
+
+        }
+
+        public void SET_DG(WorkDataUnit p_string)
+        {
+            try
+            {
+
+
+                if (this.InvokeRequired == true)
+                {
+                    //this.SET_Value_Rich(p_xml);
+                    Display s = new Display(SET_Value_Rich);
+                    //this.SET_Value_Rich(p_string);
+
+                    Thread.Sleep(1);
+
+                    this.BeginInvoke(s, new object[] { p_string });
+
+                }
+                else
+                {
+
+                    this.SET_Value_Rich(p_string);
+
+                }
+
+            }
+            catch (Exception err)
+            {
+
+                MessageBox.Show(err.ToString());
+
+            }
+
+        }
+
+        delegate void d_set_status(string p1, Boolean p2);
+        d_set_status s2;
+        public void SET_Msg(string p_string , Boolean p_add= true)
+        {
+            try
+            {
+
+
+                if (this.InvokeRequired == true)
+                {
+                    //this.SET_Value_Rich(p_xml);
+                    s2 = new d_set_status(SET_Status);
+                    //this.SET_Value_Rich(p_string);
+
+                    this.BeginInvoke(s2, new object[] { p_string, p_add });
+
+                }
+                else
+                {
+
+                    this.SET_Status(p_string ,p_add );
+
+                }
+
+            }
+            catch (Exception err)
+            {
+
+                //MessageBox.Show(err.ToString());
+
+            }
+
+        }
+
+        public void SET_Msg2(string p_string, Boolean p_add = true)
+        {
+            try
+            {
+
+
+                if (this.InvokeRequired == true)
+                {
+                    //this.SET_Value_Rich(p_xml);
+                    s2 = new d_set_status(SET_Status2);
+                    //this.SET_Value_Rich(p_string);
+
+                    this.BeginInvoke(s2, new object[] { p_string, p_add });
+
+                }
+                else
+                {
+
+                    this.SET_Status(p_string, p_add);
+
+                }
+
+            }
+            catch (Exception err)
+            {
+
+                //MessageBox.Show(err.ToString());
+
+            }
+
+        }
+        public void SET_Status2(string p_msg, bool p_add = true)
+        {
+            try
+            {
+
+                if (p_add)
+                {
+                    Application.DoEvents();
+                    ctl_textbox_naver_openapi_result.Text += p_msg + "\n" + ctl_textbox_status.Text;
+
+                    
+                }
+                else
+                {
+
+                    Application.DoEvents();
+                    ctl_textbox_status.Text = p_msg;
+                }
+
+            }
+            catch (Exception err) { }
+
+        }
+        public void SET_Status(string p_msg, bool p_add = true)
+        {
+            try
+            {
+
+                if (p_add)
+                {
+                    Application.DoEvents();
+                    ctl_textbox_status.Text = p_msg + "\n" + ctl_textbox_status.Text;
+                }
+                else
+                {
+
+                    Application.DoEvents();
+                    ctl_textbox_status.Text = p_msg;
+                }
+
+            }
+            catch (Exception err) { }
+            
+        }
+
+        public int Ltotalcount2 = 0;
+
+     
+
+        public DataSet Ldataset;
+        public OleDbDataAdapter Ladapter;
+        public OleDbConnection Lconn;
+        public OleDbCommand Lcommand;
+        public AM_CM_ADO LLado;
+        public AM_CM_Table Ltable;
+        public AM_CM_Connection LLcon;
+
+        delegate void Display2(string p_data , string p_data2);
+        public void SET_Database( string p_string , string p_string2)
+        {
+            try
+            {
+
+
+                if (this.InvokeRequired == true)
+                {
+                    //this.SET_Value_Rich(p_xml);
+                    Display2 s = new Display2(Save_Database);
+                    //this.SET_Value_Rich(p_string);
+
+                    Thread.Sleep(1);
+
+                    this.BeginInvoke(s, new object[] { p_string , p_string2 });
+
+                }
+                else
+                {
+
+                    //this.SET_Value_Rich(p_string);
+
+                }
+
+            }
+            catch (Exception err)
+            {
+
+                MessageBox.Show(err.ToString());
+
+            }
+
+        }
+
+    
+
+        public void Save_Database(string p_value1, string p_value2)
+        {
+
+            try
+            {
+                lock (Ltable)
+                {
+                    //ctl_textbox_naver_openapi_result.Text = GET_String_StringBuilder (p_data.Lmain_sentence);
+
+                    
+                    string[] sql = new string[1];
+                    
+
+                    Application.DoEvents();
+                    sql[0] = "insert into am_t_result (title, link) values ('" + p_value1 + "','" + p_value2 + "')";
+
+
+                    //MessageBox.Show(AM_CM_String.Right(sql[0], 10));
+
+                    Application.DoEvents();
+                    Ltable.RunSQL(sql);
+                }
+
+
+
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show("***" + err.ToString());
+
+            }
+
+
+        }//end function
+
+
+        public void SET_Value_Rich(WorkDataUnit p_data)
+        {
+            try
+            {
+
+
+                
+                Application.DoEvents();
+
+
+
+                this.Text = (++Ltotalcount2).ToString();
+                
+
+                if (!String.IsNullOrEmpty(p_data.Lmain_sentence))
+                {
+                    Ldatatable.LoadDataRow(new object[] {
+                                                       
+                                                          p_data.Lkeyword, 
+                                                          p_data.Lnegative , 
+                                                          p_data.Lnegative_sentence , 
+                                                          p_data.Ltitle,
+                                                          p_data.Llink , 
+                                                          p_data.Lmain_sentence,
+                                                          p_data.Lparagraph
+                
+                                                         }, true);
+
+
+                }
+
+
+                string[] sql = new string[1];
+
+                string Lstr2 = "";
+                try
+                {
+                    lock (Ltable)
+                    {
+                        //ctl_textbox_naver_openapi_result.Text = GET_String_StringBuilder (p_data.Lmain_sentence);
+
+                        string LLstring = GET_String_StringBuilder(p_data.Lmain_sentence);
+
+                        //MessageBox.Show(LLstring);
+
+                        Application.DoEvents();
+                        sql[0] = "insert into am_t_result (link,title,txt) values ('"
+                                + p_data.Llink.Replace("\'", "").Replace("\"", "") + "' , '" 
+                                + p_data.Ltitle.Replace("\'","").Replace("\"","")  
+                                + "',<accessmania>)".Replace("<accessmania>", LLstring  );
+                        
+                        Application.DoEvents();
+                        Ltable.RunSQL(sql);
+                    }
+
+                    
+
+                }
+                catch (Exception err)
+                {
+                    MessageBox.Show("***" +  err.ToString());
+
+                }
+
+
+
+
+                
+
+
+                ctl_label_naver_openapi_count.Text = Ldatatable.Rows.Count.ToString();
+                
+
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.ToString());
+
+            }
+        }
+
+        public string GET_String_StringBuilder(string p_str, char p_char = '\n')
+        {
+
+            StringBuilder Lsb = new StringBuilder();
+
+            string[] Larr = p_str.Split(new char[] { p_char });
+            string Ltmp;
+            Lsb.Append("'");
+
+            for (int LLi = 0; LLi < Larr.Length; LLi++)
+            {
+
+
+                Ltmp = GET_UTF8(Larr[LLi]).Replace("\'", "").Replace("\"" , "");
+
+                if (!string.IsNullOrEmpty(Ltmp))
+                {
+                    if (LLi < Larr.Length-2 ) Lsb.AppendLine(Ltmp + "");
+
+                }//end if
+
+            }//end for
+
+            Lsb.Append("'");
+
+            //MessageBox.Show(Lsb.ToString());
+
+            if (string.IsNullOrEmpty(Lsb.ToString())) MessageBox.Show("널");
+
+
+            return Lsb.ToString();
+
+
+        }//end function
+
+        public string GET_UTF8(string p_str)
+        {
+
+            string sample = p_str;
+
+            //인코딩 방식을 지정
+            System.Text.Encoding utf8 = System.Text.Encoding.UTF8;
+
+            //변환하고자 하는 문자열을 UTF8 방식으로 변환하여 byte 배열로 반환
+            byte[] utf8Bytes = utf8.GetBytes(sample);
+
+            // 인코된 문자열 디코딩
+            string Unicode = utf8.GetString(utf8Bytes);
+
+            return Unicode;
+
+
+        }//end function
+
+
+        public void SET_Value_Rich2(string p_value)
+        {
+            try
+            {
+                Application.DoEvents();
+                ctl_textbox_naver_openapi_result.Text = p_value;
+                
+            }
+            catch (Exception err)
+            {
+                //MessageBox.Show(err.ToString());
+
+            }
+        }
+
+        private void am_f_main_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            // 폼이 닫힐때 프로그램이 종료된다.    
+            Application.Exit();
+
+        }
+
+        private void splitContainer1_Panel2_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
+
+        public void searching()
+        {
+
+            if (String.IsNullOrEmpty(ctl_textbox_keyword.Text))
+            {
+
+                MessageBox.Show("키워드를 입력하세요.");
+                return;
+            }
+
+            ctl_datagrid_openapi_left.Rows.Clear();
+
+            string Lurl = Class.OpenAPI_Naver.GET_URL_NaverRequest(ctl_textbox_keyword.Text, 1, Ltotal, "news");
+
+            XmlTextReader Lxml = new XmlTextReader(Lurl);
+
+            XmlDocument Ldoc = new XmlDocument();
+
+            Ldoc.Load(Lxml);
+
+            XmlNodeList Lnodes = Ldoc.GetElementsByTagName("item");
+            foreach (XmlNode LLnode in Lnodes)
+            {
+                XmlElement LLe = (XmlElement)LLnode;
+                ctl_datagrid_openapi_left.Rows.Add(LLe.GetElementsByTagName("link").Item(0).InnerText, LLe.GetElementsByTagName("title").Item(0).InnerText);
+
+            }// end foreach
+
+
+
+        }
+
+        private void ctl_cmd_search_Click(object sender, EventArgs e)
+        {
+
+            searching();
+
+        }
+
+        private void ctl_cmd_test_openapi_left_Click(object sender, EventArgs e)
+        {
+
+            
+        }// end method
+
+        private void ctl_datagrid_openapi_left_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+        {
+
+            //ctl_textbox_status.Text = get_html(ctl_datagrid_openapi_left[0, e.RowIndex].Value.ToString());
+
+            return;
+            Ltf = true;
+            SET_Status("",false);
+            ctl_web_openapi.Navigate(ctl_datagrid_openapi_left[0, e.RowIndex].Value.ToString() );
+
+        }
+ 
+        public string get_html(string p_url)
+        {
+
+            Encoding Lencode;
+            string Lresult = "";
+
+            try
+            {
+                Uri Lsite = new Uri(p_url);
+                WebRequest Lreq = (HttpWebRequest)WebRequest.Create(Lsite);
+                HttpWebResponse Lres = (HttpWebResponse)Lreq.GetResponse();
+
+
+                ctl_cmd_auto.Text = Lres.CharacterSet.ToLower();
+
+                if (Lres.CharacterSet.ToLower() == "euc-kr")
+
+                    Lencode = Encoding.GetEncoding(949);
+
+                else if (Lres.CharacterSet.ToLower() == "iso-8859-1")
+                {    // 이부분만 문제가 된다. 
+
+                    Lencode = Encoding.GetEncoding(949);
+
+                }
+                else
+
+                    Lencode = Encoding.UTF8;
+
+
+                StreamReader Lsr = new StreamReader(Lres.GetResponseStream(), Lencode ,true);
+                
+
+                try
+                {
+
+                    while (!Lsr.EndOfStream)
+                    {
+                        Lresult += Lsr.ReadLine();
+                        Lresult += "\r\n";
+                    }
+                }
+                catch (Exception err)
+                {
+
+                    ctl_textbox_status.Text = err.ToString();
+                    
+                }
+
+                Lres.Close();
+            }
+            catch (Exception err)
+            {
+                Lresult = "";
+            }
+            return Lresult;
+            
+
+        }
+
+        private void ctl_datagrid_openapi_left_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
+            ctl_textbox_status.Text = get_html(ctl_datagrid_openapi_left[0, e.RowIndex].Value.ToString());
+        }// end method
+
+        private string EuckrToUtf8(string euckrStr)
+        {
+            byte[] euckrBytes = Encoding.GetEncoding(949).GetBytes(euckrStr);
+            return Encoding.UTF8.GetString(euckrBytes);
+        }
+        
+        private void ctl_web_openapi_DocumentCompleted(object sender, WebBrowserDocumentCompletedEventArgs e)
+        {
+            
+            
+            /*
+             * 이 두가지 조건을 끝까지 만족하지 못하는 웹사이트도 있다.
+             */
+
+            //if(e.Url.AbsolutePath == ctl_web_openapi.Url.AbsolutePath)
+            //if (ctl_web_openapi.ReadyState == WebBrowserReadyState.Complete)
+            //{
+             //   SET_Status(e.Url.AbsolutePath + "===" + ctl_web_openapi.Url.AbsolutePath, true);
+
+            //}
+            //return;
+
+            //if (ctl_web_openapi.ReadyState != WebBrowserReadyState.Complete || e.Url.AbsolutePath != ctl_web_openapi.Url.AbsolutePath) return;
+
+            if (Ltf == false) return;
+            
+            Ltf = false;
+
+            if (ctl_web_openapi.Document.Encoding == "euc-kr")
+            {
+                Stream docStream = ctl_web_openapi.DocumentStream;
+                StreamReader docStreamReader = new StreamReader(docStream,System.Text.Encoding.GetEncoding(ctl_web_openapi.Document.Encoding));
+                docStream.Position = 0;
+                ctl_textbox_status.Text = docStreamReader.ReadToEnd();
+
+            }
+            else
+            {
+                Stream docStream = ctl_web_openapi.DocumentStream;
+                StreamReader docStreamReader = new StreamReader(docStream, System.Text.Encoding.GetEncoding(ctl_web_openapi.Document.Encoding));
+                docStream.Position = 0;
+                ctl_textbox_status.Text = docStreamReader.ReadToEnd();
+
+            }
+
+            
+
+
+        }
+
+        private void ctl_web_openapi_Navigated(object sender, WebBrowserNavigatedEventArgs e)
+        {
+            
+        }
+
+        private void ctl_textbox_keyword_TextChanged(object sender, EventArgs e)
+        {
+            
+
+        }
+
+        private void ctl_textbox_keyword_Enter(object sender, EventArgs e)
+        {
+            
+
+        }
+
+        private void ctl_textbox_keyword_ModifiedChanged(object sender, EventArgs e)
+        {
+            
+        }
+
+        public int Lcount;
+        
+        private void ctl_textbox_status_TextChanged(object sender, EventArgs e)
+        {
+            // 이 컨트롤에 변화가 있을때에만 문자열 분석 작업을 수행한다.
+
+            
+
+            if (!String.IsNullOrEmpty(ctl_textbox_status.Text))
+            {
+                Lcurrentcursor++;
+
+             
+
+                //run();
+
+            }// end if
+
+        }
+        
+        public string Lurl = "";
+
+        public void run()
+        {
+            Lcurrentcursor = 1;
+            Lcount = Ltotal;
+            for (int i = 0; i < ctl_datagrid_openapi_left.Rows.Count; i++)
+            {
+
+                Lurl = ctl_datagrid_openapi_left[0, i].Value.ToString();
+                Thread t = new Thread(new ThreadStart(run_) );
+                t.Name = Lurl;
+                // 멀티 쓰레딩으로 값을 가져오게 해야 할거 같다. 단일 쓰레드 인 경우 
+                // 건너 뛰는 문제가 있다.
+                t.Start();
+                //ctl_textbox_status.Text = i.ToString() + "\n" + get_html(ctl_datagrid_openapi_left[0, i].Value.ToString());
+
+            }
+
+            //ctl_web_openapi.Navigate(ctl_datagrid_openapi_left[0, Lcurrentcursor].Value.ToString());
+
+        }
+
+        public void count_()
+        {
+            Lcount--;
+            
+        }
+
+        public void run_()
+        {
+            
+            //MessageBox.Show(Lcount.ToString());
+            //ctl_textbox_status.Text = Thread.CurrentThread.Name + "\n" + get_html(Lurl) + "\n";
+
+            am_f_xml t = new am_f_xml ();
+            t.Show();
+            t.am_f_xml_Load(Thread.CurrentThread.Name + "\n" + get_html(Thread.CurrentThread.Name) + "\n");
+
+            ctl_textbox_status.Text = Thread.CurrentThread.Name + "\n";
+
+            count_();
+
+            //Thread.Sleep(10000);
+            //MessageBox.Show(Thread.CurrentThread.Name);
+            //if (Lcount <= 0) MessageBox.Show(Lcount.ToString());
+                
+            //Thread.CurrentThread.Name + "\n" + get_html(Lurl) + "\n"
+
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            
+
+            run();
+
+
+        }
+
+        private void ctl_page2_Click(object sender, EventArgs e)
+        {
+
+        }
+
+
+        public Work Lwork;
+        WorkManager Lworkmanager;
+
+        private void ctl_cmd_naver_openapi_search_Click(object sender, EventArgs e)
+        {
+
+            try
+            {
+
+                LLado = new AM_CM_ADO();
+                LLcon = new AM_CM_Connection();
+                LLcon.LOAD_mdb();
+                Ltable = new AM_CM_Table(LLcon, "am_t_result");
+
+
+
+                Ltotalcount2 = 1;
+                this.SET_Msg(null, false);
+                ctl_naver_openapi_webbrowser.Navigate("");
+                ctl_textbox_naver_openapi_result.Text = "";
+
+                if (String.IsNullOrEmpty(ctl_textbox_naver_openapi_keyword.Text))
+                {
+                    MessageBox.Show("키워드를 입력하세요.");
+                    return;
+                }
+
+                if (String.IsNullOrEmpty(ctl_textbox_naver_openapi_negative.Text))
+                {
+                    MessageBox.Show("부정어를 입력하세요.");
+                    return;
+                }
+
+                Ltotalcount = 0;
+
+                ctl_textbox_status.ScrollToCaret();
+
+                this.LOAD_DG();
+
+                this.Text = "0";
+                
+
+                Lworkmanager = new WorkManager(  this
+                                                , ctl_textbox_naver_openapi_keyword.Text
+                                                , ctl_textbox_naver_openapi_negative.Text
+                                                , 100
+                                                , 2
+                                                );
+
+                Lworkmanager.Run_ThreadCaller();
+
+
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.ToString());
+
+            }
+
+        }// end method
+        //Worker Lworker;
+        //Work Lwork;
+        public void WorkTrigger_thread(string p_keyword, string p_negative, int p_length)
+        {
+
+            try
+            {
+
+                string[] Larr = p_keyword.Split(new char[] { ',' });
+
+                foreach (string LLstr in Larr)
+                {
+
+                   Work Lwork = new Work();
+
+                   Lwork.LOAD_Data_Thread(LLstr, p_negative, p_length);
+
+                    while (!Lwork.is_Complete()) ;
+
+                    //Worker Lworker = new Worker(Lwork, this);
+
+                    //Lworker.Working();
+
+                    //while (!Lwork.Lcomplete) Thread.Sleep(100);
+
+
+                }//end foreach
+
+            }
+            catch (Exception err) { }
+
+        }
+
+
+        public void WorkTrigger(string p_keyword, string p_negative, int p_length)
+        {
+            try
+            {
+
+
+                Thread Lthread = new Thread(
+
+                            delegate()
+                            {
+                                WorkTrigger_thread(p_keyword, p_negative, p_length); // 10 이라는 것은 10개의 게시물을 10개의 쓰래드가 처리 , 곧 100개의 게시물분석이 이루어진다.
+                            }
+
+                ); // end Thread
+
+
+                Lthread.Start();
+
+            }
+            catch (Exception err)
+            {   
+
+            }
+
+
+
+
+        }//end function
+
+
+
+        public void LOAD_DG()
+        {
+
+            ctl_naver_openapi_dg.DataSource = null;
+            ctl_naver_openapi_dg.DataMember = null;
+
+
+            DataSet Ldataset = new DataSet();
+
+            Ldatatable = null;
+            Ldatatable = new DataTable();
+            Ldatatable.TableName = "naver_openapi";
+
+
+
+            
+            Ldatatable.Columns.Add("keyword", typeof(string));
+            Ldatatable.Columns.Add("negative", typeof(string));
+            Ldatatable.Columns.Add("negative_sentence", typeof(string));
+            Ldatatable.Columns.Add("title", typeof(string));
+            Ldatatable.Columns.Add("link", typeof(string));
+            Ldatatable.Columns.Add("string from html", typeof(string));
+            Ldatatable.Columns.Add("paragraph", typeof(string));
+
+            Ldataset.Tables.Add(Ldatatable);
+
+            ctl_naver_openapi_dg.DataSource = Ldataset;
+            ctl_naver_openapi_dg.DataMember = "naver_openapi";
+
+            ctl_naver_openapi_dg.Columns[0].Width = 100;
+            ctl_naver_openapi_dg.Columns[1].Width = 100;
+            ctl_naver_openapi_dg.Columns[2].Width = 200;
+            ctl_naver_openapi_dg.Columns[3].Width = 100;
+            ctl_naver_openapi_dg.Columns[4].Width = 100;
+            ctl_naver_openapi_dg.Columns[5].Width = 100;
+            ctl_naver_openapi_dg.Columns[6].Width = 100;
+
+
+
+
+        }
+
+        private void ctl_naver_openapi_dg_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            
+
+        }
+
+        private void ctl_naver_openapi_dg_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+        {
+
+            string LLstr = "";
+            try
+            {
+
+                ctl_textbox_naver_openapi_result.Text = LLstr + ctl_naver_openapi_dg[5, e.RowIndex].Value.ToString().Trim();
+                return;
+
+                ctl_naver_openapi_webbrowser.Navigate(ctl_naver_openapi_dg[4, e.RowIndex].Value.ToString());
+
+                LLstr = "-------------------------------------------------------------\n";
+                LLstr += "★     분석결과보고     ★\n";
+                LLstr += ctl_naver_openapi_dg[2, e.RowIndex].Value.ToString() +"" ;
+                LLstr += ctl_naver_openapi_dg[6, e.RowIndex].Value.ToString() + "\n";
+                LLstr += "-------------------------------------------------------------\n";
+                LLstr += "★     본문이라고 추정되는 문장들     ★\n";
+                LLstr += "-------------------------------------------------------------\n";
+
+                ctl_textbox_naver_openapi_result.Text = LLstr + ctl_naver_openapi_dg[5, e.RowIndex].Value.ToString();
+                    
+            }
+            catch (Exception err) { }
+
+        }
+
+        private void ctl_naver_openapi_dg_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
+        }
+
+        private void ctl_cmd_test_save_Click(object sender, EventArgs e)
+        {
+
+
+            string[] sql = new string[1];
+            string LLstr;
+            LLado = new AM_CM_ADO();
+            LLcon = new AM_CM_Connection();
+            LLcon.LOAD_mdb();
+            Ltable = new AM_CM_Table(LLcon, "am_t_result");
+            
+            try
+            {
+
+
+                for (int i = 0; i < ctl_naver_openapi_dg.Rows.Count; i++)
+                {
+
+                    LLstr = ctl_naver_openapi_dg[5, i].Value.ToString();
+                    
+                    /*
+                    Encoding Lunicode = Encoding.GetEncoding("EUC-KR");
+                    byte[] arr_unicode = Lunicode.GetBytes(LLstr);
+                    LLstr = Lunicode.GetString(arr_unicode);
+                    */
+
+
+                    LLstr = this.GET_String_StringBuilder(LLstr);
+
+                    
+                    sql[0] = "insert into am_t_result (txt) values ('<accessmania>')".Replace("<accessmania>", LLstr);
+
+                    
+
+                    //ctl_naver_openapi_dg[5, i].Value.ToString().Substring(0,100)
+                    MessageBox.Show( "Ddd");
+                    lock (Ltable)
+                    {
+
+                        Ltable.RunSQL(sql);
+                        Thread.Sleep(1000);
+
+                    }
+                }
+
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.ToString());
+
+            }
+        }
+
+
+    }//end class form 
+
+    public struct Result
+    {
+        public string Ltitle;
+        public string Llink;
+        public string Lkeyword;
+        public string Lnegative;
+        public string Lkeyword_sentence;
+        public string Lnegative_sentence;
+        public string Lmain_sentence;
+        public string Lparagraph;
+
+    }
+
+
+    public struct WorkDataUnit
+    {
+        public string Ltitle;
+        public string Llink;
+        public string Lkeyword;
+        public string Lnegative;
+        public string Lkeyword_sentence;
+        public string Lnegative_sentence;
+        public string Lmain_sentence;
+        public string Lparagraph;
+
+    }
+
+    public struct SentenceInfo
+    {
+        public int Lindex;
+
+        public string Lsentence;
+
+        public Boolean Lkeyword;
+        public string Lkeywordstring;
+
+        public Boolean Lnegative;
+        public string Lnegativestring;
+
+    }//end struct
+
+    public class Worker_Unit
+    {
+        public WorkDataUnit Linfo;
+        public WebBrowser Lweb;
+        public Boolean Lusing;
+
+
+        public Worker_Unit()
+        {
+            Lusing = false;
+            Lweb = new WebBrowser();
+            Lweb.ScriptErrorsSuppressed = true;
+            Lweb.DocumentCompleted += new WebBrowserDocumentCompletedEventHandler(callback);
+            
+        }//end function
+
+        public void run(WorkDataUnit p)
+        {
+            Lusing = true;
+            Linfo = p;
+            Lweb.Navigate(Linfo.Llink);
+
+        }//end run
+
+
+        private void callback(object sender, WebBrowserDocumentCompletedEventArgs e)
+        {
+
+            WebBrowser Lweb = (WebBrowser)sender;
+
+            Lweb.ScriptErrorsSuppressed = true;
+
+            mshtml.IHTMLDOMNode Lnode;
+            mshtml.HTMLDocumentClass Ldoc;
+            mshtml.IHTMLElementCollection Les;
+
+
+            if (Lweb.ReadyState == WebBrowserReadyState.Complete)
+            {
+
+                Ldoc = Lweb.Document.DomDocument as mshtml.HTMLDocumentClass;
+
+                Les = Ldoc.getElementsByTagName("a");
+                foreach (dynamic i in Les) i.parentNode.removeChild(i);
+
+
+                Les = Ldoc.getElementsByTagName("meta");
+                foreach (dynamic i in Les) i.parentNode.removeChild(i);
+
+                Les = Ldoc.getElementsByTagName("link");
+                foreach (dynamic i in Les) i.parentNode.removeChild(i);
+
+                Les = Ldoc.getElementsByTagName("script");
+                foreach (dynamic i in Les) i.parentNode.removeChild(i);
+
+
+
+                //ctl_result.Text = Ldoc.documentElement.innerHTML;
+                Lusing = false;
+
+                MessageBox.Show(Ldoc.documentElement.innerText);
+            }
+
+
+
+        }
+
+
+    }
+
+    public class Worker
+    {
+
+        public Work Lwork;
+        public const int Lmax = 10;
+        public Thread[] Lthread = new Thread[Lmax];
+
+        
+        public AM_CM_Connection Lcon;
+        public string Lkeyword;
+        public AM_CM_XML Lxml;
+        public am_f_main Lform;
+        public Thread LLworkingthread;
+
+        public Boolean Lcallnext;
+
+        public Worker(Work p_work, AM_CM_XML p_xml)
+        {
+            try
+            {
+                Lcallnext = false;
+
+                Lwork = p_work;
+                
+                Lform = Lwork.Lform;
+
+                Lxml = p_xml;
+                Lxml.moveFirst();
+
+                for (int i = 0; i < Lmax; i++) Lthread[i] = null;
+
+            }catch (Exception err){}//end catch
+            
+
+        }//end function Worker
+
+        public void run_ThreadCaller()
+        {
+
+            string LLlink;
+
+            try
+            {
+
+                lock (Lxml)
+                {
+                    if (Lxml.EOF()) return;
+                }//end lock
+
+
+                if (this.GET_Empty_Thread_Number() == -1) return;
+
+                for (int i = 0; i < Lmax; i++)
+                {
+                    lock (Lxml)
+                    {
+                        LLlink = Lxml.GET_Value_Attribute_Cursor("link");
+                        Lxml.moveNext();
+                    }
+
+                    Lthread[i] = new Thread(
+                                                delegate()
+                                                {
+                                                    run_ThreadCallee (LLlink, i);
+                                                }
+
+                                           );
+
+                    Lthread[i].Start();
+
+
+                }//end for
+
+
+
+
+
+            }
+            catch (Exception err) { }
+
+
+        }//end function
+
+        public void run_ThreadCaller(int i)
+        {
+
+            string LLlink;
+
+            try
+            {
+
+                
+                lock (Lxml)
+                {
+                    
+
+                    if (Lxml.EOF())
+                    {
+                        if (Lcallnext == false)
+                        {   
+                            Lcallnext = true;
+                            Lwork.Run_ThreadCaller();
+
+                        }
+                        Thread.CurrentThread.Abort();
+                        return;
+
+                    }//end if
+
+                    LLlink = Lxml.GET_Value_Attribute_Cursor("link");
+                    Lxml.moveNext();
+
+                
+                }//end lock
+
+                Lthread[i] = new Thread(
+                                            delegate()
+                                            {
+                                                run_ThreadCallee(LLlink, i);
+                                            }
+
+                                       );
+
+                Lthread[i].Start();
+
+
+            }
+            catch (Exception err) { }
+
+
+
+        }//end function
+
+        public void run_ThreadCallee(string p_link, int i)
+        {
+            string LLhtmltext = "";
+
+            if (string.IsNullOrEmpty(p_link))
+            {
+
+                this.run_ThreadCaller(i);
+                return;
+            }
+
+            string p_url = p_link;
+
+
+            try
+            {
+                try
+                {
+
+                    LLhtmltext = GET_Text_From_URL(p_url, false, Lxml.GET_Value(p_link, "keyword"));
+
+                        
+
+                    LLhtmltext = GET_Text_From_HTML(LLhtmltext);
+
+                    Lwork.Lform.Text = (int.Parse(Lwork.Lform.Text)).ToString();
+
+
+                    lock (Lxml)
+                    {
+                        //이 시점에 분석 완료된 결과를 바로 db 에 저장한다?
+                        WorkDataUnit LLreturn = new WorkDataUnit();
+
+                        LLreturn.Ltitle = Lxml.GET_Value(p_link, "title");
+                        LLreturn.Llink = Lxml.GET_Value(p_link, "link");
+                        LLreturn.Lkeyword = Lxml.GET_Value(p_link, "keyword");
+                        LLreturn.Lnegative = Lxml.GET_Value(p_link, "negative");
+
+                        StringBuilder LLsb = new StringBuilder();
+
+
+                        LLreturn.Lmain_sentence = LLhtmltext;
+
+
+                        LLreturn = analysis_Negative(LLreturn);
+
+                        Lform.SET_DG(LLreturn);
+
+
+                    }//end lock
+
+
+
+                }
+                catch (Exception err)
+                {
+                    MessageBox.Show(err.ToString());
+                }
+
+
+            }
+            catch (Exception err) { }
+
+            this.run_ThreadCaller(i);
+
+
+        }
+
+        public int GET_Alive_Thread()
+        {
+            int Lreturn=0;
+            for (int i = 0; i < Lmax; i++)
+            {
+                if (Lthread[i].IsAlive) Lreturn++;
+
+            }
+
+            return Lreturn;
+
+        }
+
+
+        public int GET_Empty_Thread_Number()
+        {
+
+            try
+            {
+
+                for (int i = 0; i < Lmax; i++)
+                {
+                    if (Lthread[i] == null)
+                    {
+                        return i;
+                    }
+                    if (!Lthread[i].IsAlive)
+                    {
+                        return i;
+                    }
+
+                }//end for
+            }
+            catch (Exception err) { }
+            return -1;
+
+        }//end function
+
+        public string GET_Text_From_HTML(string p_html, string p_ex_tag = "a,meta,link,script,comment(),style,title")
+        {
+
+            try
+            {
+
+
+                HtmlAgilityPack.HtmlDocument LLdoc = new HtmlAgilityPack.HtmlDocument();
+                HtmlAgilityPack.HtmlNodeCollection Lnodes;
+
+                LLdoc.LoadHtml(p_html);
+
+                string[] LLarr = p_ex_tag.Split(new char[] { ',' });
+                string LLxpath = null;
+
+                foreach (string LLstr in LLarr) LLxpath += " | //" + LLstr;
+
+                LLxpath = AM_CM_String.CutHead(LLxpath, 2).Trim();
+
+
+                HtmlAgilityPack.HtmlNodeCollection
+                    LLc = LLdoc.DocumentNode.SelectNodes(LLxpath);
+
+
+                foreach (HtmlAgilityPack.HtmlNode LLn in LLc) LLn.Remove();
+
+
+                return  LLdoc.DocumentNode.InnerText ;
+
+
+            }
+            catch { return ""; }
+
+
+        }//end function
+
+        public WorkDataUnit analysis_Negative(WorkDataUnit p_data, Boolean p_check_key = false, Boolean p_check_nega = true, Boolean p_check_key_nega = true)
+        {
+            string LLmain, LLkeyword, LLnegative, LLkeyword_sentence = "", LLnegative_sentence = "";
+            string LLnega_tmp = "", LLstr_tmp = "";
+            string[] LLarr, LLarrtmp;
+            string LLmainsentence = "";
+            int LLpos;
+
+
+            try
+            {
+
+                LLmain = p_data.Lmain_sentence;
+                LLkeyword = p_data.Lkeyword;
+                LLnegative = p_data.Lnegative;
+
+
+                //---------------------------------------------------------
+
+                LLmain = LLmain.Replace("\n", "★");
+                LLmain = LLmain.Replace(Environment.NewLine, "★");
+
+                LLarrtmp = LLmain.Split(new char[] { '★' });
+
+                foreach (string LLLtmp in LLarrtmp)
+                {
+                    if (!String.IsNullOrEmpty(LLLtmp.Trim()) && LLLtmp.Trim().Length > 20)
+                        LLstr_tmp += LLLtmp.Trim() + "\n";
+                }
+
+                LLmain = LLstr_tmp;
+
+
+                // LLarrtmp 의 내용은 문장이 그 요소라고 여겨지는 내용들이다.
+                LLstr_tmp = "";
+                LLarrtmp = LLmain.Split(new string[] { "." }, StringSplitOptions.None);
+                foreach (string LLLtmp in LLarrtmp)
+                {
+                    if (LLLtmp.Trim().Length > 9) LLstr_tmp += LLLtmp.Trim() + ".\n";
+
+                }
+                LLmain = LLstr_tmp;
+                p_data.Lmain_sentence = LLmain;
+
+
+
+
+
+                // 키워드
+
+                if (LLmain.IndexOf(LLkeyword) > 0)
+                {
+                    LLpos = LLmain.IndexOf(LLkeyword);
+
+                    LLkeyword_sentence = LLmain.Substring(LLpos, LLkeyword.Length);
+
+                }
+
+
+                SentenceInfo[] LLarrsentenceinfo;
+
+                // 부정어
+                if (!String.IsNullOrEmpty(LLnegative))
+                {
+                    LLarr = LLnegative.Split(new char[] { ',' });
+                    LLnegative_sentence = "";
+
+
+                    LLarrsentenceinfo = new SentenceInfo[LLarrtmp.Length];
+                    // 문장 행번호(인덱스) , 키워드 , 부정어
+
+
+                    for (int LLindex = 0; LLindex < LLarrtmp.Length; LLindex++)
+                    {
+
+                        LLmainsentence = LLarrtmp[LLindex];
+                        LLarrsentenceinfo[LLindex].Lindex = LLindex;
+                        LLarrsentenceinfo[LLindex].Lsentence = LLmainsentence.Replace(LLkeyword, "★" + LLkeyword);
+
+
+                        foreach (string LLnega in LLarr)
+                        {
+
+
+                            if ((LLmainsentence.IndexOf(LLkeyword) != -1) && (LLmainsentence.IndexOf(LLnega) != -1) && p_check_key_nega)
+                            {
+                                LLnegative_sentence += "[키워드:" + LLkeyword + ",부정어:" + LLnega + "] "
+                                + LLmainsentence.Replace("\n", "").Replace(LLkeyword, "★" + LLkeyword + "")
+                                .Replace(LLnega, "●" + LLnega + "") + "\n";
+
+                                LLarrsentenceinfo[LLindex].Lsentence = LLmainsentence.Replace(LLkeyword, "★" + LLkeyword + "").Replace(LLnega, "●" + LLnega);
+
+                                LLarrsentenceinfo[LLindex].Lkeyword = true;
+                                LLarrsentenceinfo[LLindex].Lnegative = true;
+
+                            }//end if 키워드와 부정어가 함께 있는 문장이라고 볼 수 있다.
+                            else if ((LLmainsentence.IndexOf(LLkeyword) == -1) && (LLmainsentence.IndexOf(LLnega) != -1) && p_check_nega)
+                            {
+
+                                LLnegative_sentence += "[부정어:" + LLnega + "] " + LLmainsentence.Replace("\n", "")
+                                .Replace(LLnega, "●" + LLnega + "") + "\n";
+
+                                LLarrsentenceinfo[LLindex].Lsentence = LLmainsentence.Replace(LLkeyword, "★" + LLkeyword + "").Replace(LLnega, "●" + LLnega);
+                                LLarrsentenceinfo[LLindex].Lkeyword = false;
+                                LLarrsentenceinfo[LLindex].Lnegative = true;
+
+
+                            }//end if
+                            else if ((LLmainsentence.IndexOf(LLkeyword) != -1) && (LLmainsentence.IndexOf(LLnega) == -1) && p_check_key)
+                            {
+
+                                LLnegative_sentence += "[키워드:" + LLkeyword + "] "
+                                + LLmainsentence.Replace("\n", "").Replace(LLkeyword, "★" + LLkeyword + "")
+                                .Replace(LLnega, "●" + LLnega + "") + "\n";
+
+                                LLarrsentenceinfo[LLindex].Lsentence = LLmainsentence.Replace(LLkeyword, "★" + LLkeyword + "").Replace(LLnega, "●" + LLnega);
+                                LLarrsentenceinfo[LLindex].Lkeyword = true;
+                                LLarrsentenceinfo[LLindex].Lnegative = false;
+
+
+                            }
+
+                            /*
+                            if ((LLmainsentence.IndexOf(LLkeyword) == -1) && (LLmainsentence.IndexOf(LLnega) == -1))
+                            {
+                                LLnegative_sentence += "[키워드:" + LLkeyword + "] "
+                                + LLmainsentence.Replace("\n", "").Replace(LLkeyword, "★" + LLkeyword + "")
+                                .Replace(LLnega, "●" + LLnega + "") + "\n";
+
+                                LLarrsentenceinfo[LLindex].Lsentence = LLmainsentence;
+                                LLarrsentenceinfo[LLindex].Lkeyword = true;
+                                LLarrsentenceinfo[LLindex].Lnegative = false;
+
+                            }//end if
+                        
+                            */
+
+
+                        }//end foreach 부정어
+
+                    }//end foreach 문장 행
+
+                    string tmp = GET_Text_Paragraph(LLarrsentenceinfo);
+
+
+                    if (String.IsNullOrEmpty(tmp))
+                        p_data.Lparagraph = "[문단:X,키워드와 부정어를 동시에 포함하는 경우가 없습니다.]";
+
+                    else
+                        p_data.Lparagraph = "[문단]---------------------------------------------------------\n"
+                                        + tmp
+                                        + "\n";
+
+
+                }//end if 부정어 단어들이 있다면
+
+
+
+                p_data.Lkeyword_sentence = LLkeyword_sentence;
+                p_data.Lnegative_sentence = LLnegative_sentence;
+            }
+            catch (Exception err) { }
+
+            return p_data;
+
+        }
+
+        public string GET_Text_Paragraph(SentenceInfo[] p_arr)
+        {
+            // 키워드를 기준으로
+            int LLkeywordstart = -1;
+            int LLkey_negative_end = -1;
+            int LLnegativecontain = -1;
+
+            for (int LLctn = 0; LLctn < p_arr.Length; LLctn++)
+            {
+                if (p_arr[LLctn].Lkeyword == true && LLkeywordstart == -1) LLkeywordstart = LLctn;
+
+                if (p_arr[LLctn].Lnegative == true) LLnegativecontain = LLctn;
+
+                if (p_arr[LLctn].Lkeyword == true || p_arr[LLctn].Lnegative == true) LLkey_negative_end = LLctn;
+
+
+            }
+
+            int LLkeyword_result_start = -1, LLkeyword_result_end = -1;
+
+            if (LLkeywordstart != -1 && LLnegativecontain != -1 && LLkey_negative_end != -1)
+            {
+                LLkeyword_result_start = LLkeywordstart;
+                LLkeyword_result_end = LLkey_negative_end;
+            }
+
+
+            //부정어를 기준으로
+            int LLnegativestart = -1;
+            int LLkeywordcontain = -1;
+            LLkey_negative_end = -1;
+
+
+            for (int LLctn = 0; LLctn < p_arr.Length; LLctn++)
+            {
+                if (p_arr[LLctn].Lnegative == true && LLnegativestart == -1) LLnegativestart = LLctn;
+
+                if (p_arr[LLctn].Lkeyword == true) LLkeywordcontain = LLctn;
+
+                if (p_arr[LLctn].Lkeyword == true || p_arr[LLctn].Lnegative == true) LLkey_negative_end = LLctn;
+
+
+            }
+
+            int LLnegative_result_start = -1, LLnegative_result_end = -1;
+
+            if (LLnegativestart != -1 && LLkeywordcontain != -1 && LLkey_negative_end != -1)
+            {
+                LLnegative_result_start = LLnegativestart;
+                LLnegative_result_end = LLkey_negative_end;
+            }
+
+            int LLkey_result_length = -1, LLnegative_result_length = -1;
+
+            if (LLkeyword_result_start != -1 && LLkeyword_result_end != -1)
+                LLkey_result_length = LLkeyword_result_end - LLkeyword_result_start;
+
+            if (LLnegative_result_start != -1 && LLnegative_result_end != -1)
+                LLnegative_result_length = LLnegative_result_end - LLnegative_result_start;
+
+
+            if (LLkey_result_length == -1 && LLnegative_result_length == -1) return "";
+
+
+            string LLresult = "";
+
+
+            if (LLkey_result_length >= LLnegative_result_length)
+            {
+                for (int i = LLkeyword_result_start; i <= LLkeyword_result_end; i++)
+                {
+                    LLresult += p_arr[i].Lsentence.Replace("\n", "").Replace(Environment.NewLine, "").Trim();
+
+                }//end for
+
+            }
+            else
+            {
+                for (int i = LLnegative_result_start; i <= LLnegative_result_end; i++)
+                {
+                    LLresult += p_arr[i].Lsentence.Replace("\n", "").Replace(Environment.NewLine, "").Trim();
+
+                }//end for
+
+
+
+            }
+
+
+
+            return LLresult;
+
+        }
+
+        public string GET_Text_Keyword(string p_mainstring, string p_keyword)
+        {
+            return p_mainstring;
+
+        }//end function
+
+        public string GET_Text_Negative(string p_mainstring, string p_keyword)
+        {
+            return p_mainstring;
+
+        }//end function
+
+        public string GET_Text_From_URL(string p_url, Boolean p_txt_html = true, string p_keyword = null)
+        {
+
+
+
+            try
+            {
+
+
+                System.Text.Encoding euckr = System.Text.Encoding.GetEncoding(51949);//euckr
+
+
+
+
+                HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument();
+
+                HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(p_url);
+
+                request.UserAgent = request.UserAgent;
+
+                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+
+
+
+
+                //초반 부분에서 charset확인
+
+                int len = 1024;
+
+                byte[] barr = new byte[len];
+
+                Stream stream = response.GetResponseStream();
+
+                int read_size = stream.Read(barr, 0, (int)len);
+
+
+                //StreamReader LLstreamreader = new StreamReader(stream, Encoding.Default, true);
+
+
+
+                string data = Encoding.UTF8.GetString(barr);
+
+                var encod = doc.DetectEncodingHtml(data);
+
+                string LLencoding = doc.Encoding.EncodingName;
+
+                if (encod == null) encod = euckr;//default
+                //if (encod == null) encod = Encoding.UTF8;//default
+
+
+                //나머지 읽기
+                int total_size = read_size;
+
+                while (read_size > 0)
+                {
+
+                    byte[] barr2 = new byte[total_size * 2];
+
+                    for (int a = 0; a < total_size; a++) barr2[a] = barr[a];//복사
+
+                    read_size = stream.Read(barr, 0, total_size);
+
+                    for (int a = 0; a < read_size; a++) barr2[total_size + a] = barr[a];//복사
+
+                    total_size += read_size;
+
+                    barr = barr2;
+
+                }
+
+                response.Close();
+
+
+                string convstr = GET_String_With_Encoding(barr, p_keyword);
+
+
+
+                    if (convstr.IndexOf("다") == -1) MessageBox.Show(convstr);
+                    
+                    //MessageBox.Show(convstr.Substring(1, 1000));
+
+                //if (convstr.IndexOf(p_keyword) == -1)
+                //      Lform.SET_Value_Rich2(convstr);
+
+
+                HtmlAgilityPack.HtmlDocument LLdoc = new HtmlAgilityPack.HtmlDocument();
+
+                LLdoc.LoadHtml(convstr);
+
+                if (p_txt_html)
+
+                    return LLdoc.DocumentNode.InnerText ;
+
+                else
+
+                    return LLdoc.DocumentNode.InnerHtml;
+
+
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.ToString());
+                return "";
+            }
+
+
+
+        }//end function
+
+        public Boolean GET_RightEncoding(string p_mainstring, string p_word)
+        {
+
+            string[] LLarr = p_word.Split(new char[] { ',' });
+
+            foreach (string LLtmp in LLarr)
+            {
+                if (p_mainstring.IndexOf(LLtmp) != -1) return true;
+
+            }
+            return false;
+
+
+        }
+
+        public string GET_String_With_Encoding(byte[] p_arr, string p_keyword)
+        {
+            //string LLstring = p_string;
+            string LLstring_convert = null;
+
+            var LLeuckr = Encoding.GetEncoding("EUC-KR");
+            var LLeuckr2 = Encoding.GetEncoding(51949);
+            var LLutf8 = Encoding.UTF8;
+            var LLutf8_2 = Encoding.GetEncoding(65001);
+            var LLutf32 = Encoding.UTF32;
+            var LLunicode = Encoding.Unicode;
+            var LLiso = Encoding.GetEncoding(50225);
+            string LLwords = "가,나,다,라,마,바,사,아,자,차,카,타,파,하,아,에,이,오,우,음,까,네";
+
+
+            LLstring_convert = Encoding.Unicode.GetString(Encoding.Convert(LLutf8, LLunicode, p_arr));
+            if (GET_RightEncoding(LLstring_convert, LLwords)) return LLstring_convert;
+
+            LLstring_convert = Encoding.Unicode.GetString(Encoding.Convert(LLutf32, LLunicode, p_arr));
+            if (GET_RightEncoding(LLstring_convert, LLwords)) return LLstring_convert;
+
+            LLstring_convert = Encoding.Unicode.GetString(Encoding.Convert(LLeuckr, LLunicode, p_arr));
+            if (GET_RightEncoding(LLstring_convert, LLwords)) return LLstring_convert;
+
+            LLstring_convert = Encoding.Unicode.GetString(Encoding.Convert(LLiso, LLunicode, p_arr));
+            if (GET_RightEncoding(LLstring_convert, LLwords)) return LLstring_convert;
+
+            LLstring_convert = Encoding.Unicode.GetString(Encoding.Convert(LLunicode, LLunicode, p_arr));
+            if (GET_RightEncoding(LLstring_convert, LLwords)) return LLstring_convert;
+
+            LLstring_convert = Encoding.Unicode.GetString(Encoding.Convert(LLeuckr2, LLunicode, p_arr));
+            if (GET_RightEncoding(LLstring_convert, LLwords)) return LLstring_convert;
+
+            LLstring_convert = Encoding.Unicode.GetString(Encoding.Convert(LLutf8_2, LLunicode, p_arr));
+            if (GET_RightEncoding(LLstring_convert, LLwords)) return LLstring_convert;
+
+
+            LLstring_convert = Encoding.Unicode.GetString(Encoding.Convert(LLeuckr, LLunicode, p_arr));
+            if (GET_RightEncoding(LLstring_convert, LLwords)) return LLstring_convert;
+
+
+            //---------한글을 찾을 수 없을때
+            LLstring_convert = Encoding.Unicode.GetString(Encoding.Convert(LLutf8, LLunicode, p_arr));
+            if (GET_RightEncoding(LLstring_convert, "script,meta")) return LLstring_convert;
+
+            LLstring_convert = Encoding.Unicode.GetString(Encoding.Convert(LLeuckr, LLunicode, p_arr));
+            if (GET_RightEncoding(LLstring_convert, LLwords)) return LLstring_convert;
+
+
+            return null;
+
+
+        }
+
+
+//==============================================================================================================================================
+
+
+        public void Working()
+        {
+
+            string LLlink;
+
+            try
+            {
+
+
+                    if (Lxml.EOF()) return;
+
+                    if (this.GET_Empty_Thread_Number() == -1) return;
+
+                    for (int i = 0; i < Lmax; i++)
+                    {
+                        lock (Lxml) 
+                        {
+                            LLlink = Lxml.GET_Value_Attribute_Cursor("link");
+                            Lxml.moveNext();
+                        }
+
+                        Lthread[i] = new Thread(
+                                                    delegate()
+                                                    {
+                                                        Working_thread(LLlink, i);
+                                                    }
+
+                                               );
+
+                            Lthread[i].Start();
+                            
+
+                    }//end for
+
+                
+                        
+
+                
+            }catch(Exception err){}
+
+
+        }//end function
+
+        public void Working(int i)
+        {
+
+            string LLlink;
+
+            try
+            {
+
+                if (Lxml.EOF())
+                {   
+                 
+                    Thread.CurrentThread.Abort();
+
+                    return;
+
+                }//end if
+
+                lock (Lxml)
+                {
+                    LLlink = Lxml.GET_Value_Attribute_Cursor("link");
+                    Lxml.moveNext();
+                }
+
+                Lthread[i] = new Thread(
+                                            delegate()
+                                            {
+                                                Working_thread(LLlink, i);
+                                            }
+
+                                       );
+
+                Lthread[i].Start();
+                        
+                
+            }
+            catch (Exception err) { }
+
+
+
+        }//end function
+
+        public void Working_thread( string p_link, int i)
+        {
+            string LLhtmltext = "";
+
+            if (string.IsNullOrEmpty(p_link))
+            {
+                
+                this.Working(i);
+                return;
+            }
+
+            string p_url = p_link;
+            
+
+            try
+            {
+                try
+                {
+
+                    LLhtmltext = GET_Text_From_URL(p_url, false, Lxml.GET_Value(p_link, "keyword"));
+
+                    LLhtmltext = GET_Text_From_HTML(LLhtmltext);
+
+                 
+                    lock (Lxml)
+                    {
+                        //이 시점에 분석 완료된 결과를 바로 db 에 저장한다?
+                        WorkDataUnit LLreturn = new WorkDataUnit();
+
+                        LLreturn.Ltitle = Lxml.GET_Value(p_link, "title");
+                        LLreturn.Llink = Lxml.GET_Value(p_link, "link");
+                        LLreturn.Lkeyword = Lxml.GET_Value(p_link, "keyword");
+                        LLreturn.Lnegative = Lxml.GET_Value(p_link, "negative");
+
+                        LLreturn.Lmain_sentence = LLhtmltext;
+
+                        LLreturn = analysis_Negative(LLreturn);
+
+                        Lform.SET_DG(LLreturn);
+
+
+                    }
+
+
+
+                }
+                catch (Exception err)
+                {
+                    MessageBox.Show(err.ToString());
+                }
+
+
+            }
+            catch (Exception err) { }
+
+            this.Working(i);
+
+
+        }
+
+        public void Working_thread(WorkDataUnit p_data, int i)
+        {
+            string LLhtmltext = "";
+            string p_url = p_data.Llink;
+            
+            try
+            {
+                try
+                {
+                    Lform.SET_Msg("[Thread NO : " + i.ToString() + " ] 분석중\n[분석URL] " + p_data.Llink , true);
+
+
+                 //======================================================================================================
+
+                    LLhtmltext = GET_Text_From_URL(p_url ,false , p_data.Lkeyword);
+
+                    LLhtmltext = GET_Text_From_HTML(LLhtmltext);
+
+                    p_data.Lmain_sentence = LLhtmltext;
+
+                //======================================================================================================
+
+                    Thread.Sleep(10);
+
+                    CheckBox c_key = (CheckBox)Lform.Controls.Find("ctl_checkbox_key",true)[0];
+                    CheckBox c_nega = (CheckBox)Lform.Controls.Find("ctl_checkbox_nega", true)[0];
+                    CheckBox c_key_nega = (CheckBox)Lform.Controls.Find("ctl_checkbox_key_nega", true)[0];
+
+                    Lform.SET_DG(analysis_Negative(p_data, c_key.Checked, c_nega.Checked, c_key_nega.Checked));
+
+                    Thread.Sleep(10);
+                    //Lform.SET_Msg("[Thread no : " + i.ToString() + " ] 분석완료", true);
+
+
+
+                }
+                catch (Exception err) {    
+                    MessageBox.Show(err.ToString());
+                }
+
+
+            }
+            catch (Exception err) { }
+
+            this.Working(i);
+
+
+        }
+
+        public void run_once(int p_index, string p_title, string p_link, string p_keyword, string p_negative)
+        {
+
+            try
+            {
+
+                string LLlink = null;
+                string LLcursor = null;
+                string LLkeyvalue = null;
+                lock (Lxml)
+                {
+                    Lxml.moveNext();
+
+                    LLcursor = Lxml.GET_Cursor();
+
+                    if (Lxml.EOF())
+                    {
+
+                        return;
+
+                    }
+
+                    LLlink = Lxml.GET_Value_Attribute_Cursor("link");
+                    LLkeyvalue = Lxml.GET_Value_Attribute_Cursor("code");
+
+                }//end lock
+
+                //MessageBox.Show(p_index.ToString() + "\n" + LLlink);
+
+
+                Lthread[p_index] = new Thread(
+                                                delegate()
+                                                {
+
+                                                    get_html(p_index, p_title, LLlink, "d", LLkeyvalue);
+
+                                                }
+
+                                            );
+
+                Lthread[p_index].Start();
+            }
+            catch (Exception err)
+            {
+                //MessageBox.Show(err.ToString());
+            }
+        }//end function
+
+        public void run(AM_CM_XML p_xml)
+        {
+
+            try
+            {
+                Lxml = p_xml;
+
+                lock (p_xml)
+                {
+                    p_xml.moveFirst();
+
+                    Lform.SET_Value_Rich2(p_xml.GET_Value_Attribute_Cursor("link"));
+
+                    for (int i = 0; i < 20; i++)
+                    {
+                        Lthread[i] = new Thread(
+                                                    delegate()
+                                                    {
+
+                                                        get_html(i, p_xml.GET_Value_Attribute_Cursor("title"), p_xml.GET_Value_Attribute_Cursor("link"), p_xml.GET_Value_Attribute_Cursor("code"), "d");
+
+                                                    }
+
+                                                );
+
+                        Lthread[i].Start();
+                        p_xml.moveNext();
+
+                    }//end for
+
+                }//end lock
+            }
+            catch (Exception err)
+            {
+                //MessageBox.Show(err.ToString());
+            }
+        }//end function
+
+        public string get_html(int p_index, string p_title, string p_link, string p_keyword, string p_negative)
+        {
+
+
+            string Lresult = "";
+            string LLs = "";
+            string p_url = p_link;
+            int Lindex = p_index;
+
+            try
+            {
+
+                try
+                {
+
+                    LLs = get_html_from_url(p_url);
+
+                    HtmlAgilityPack.HtmlDocument LLdoc = new HtmlAgilityPack.HtmlDocument();
+                    LLdoc.LoadHtml(LLs);
+
+                    //Lform.set_xml(p_title, p_link, this.get_sentence( LLdoc.DocumentNode.InnerText,Lkeyword) , p_negative);
+
+                    this.run_once(Lindex, p_title, p_link, p_keyword, p_negative);
+
+                    return Lresult;
+
+
+                }
+                catch (Exception err)
+                {
+                    //MessageBox.Show(err.ToString());
+
+                }
+
+                // Lres.Close();
+            }
+            catch (Exception err)
+            {
+                Lresult = "";
+            }
+
+            //MessageBox.Show(Lresult.Substring(1 ,1000));
+
+
+            return "";
+
+
+        }
+
+        public string get_sentence(string p_main_string, string p_word)
+        {
+
+            MessageBox.Show(p_main_string + "\n" + p_word);
+
+            if (p_main_string.IndexOf(p_word) <= 0) return "";
+
+            return p_main_string.Substring(
+                                    p_main_string.IndexOf(p_word),
+                                    20);
+
+
+        }
+
+        public string get_html_from_url(string p_url)
+        {
+
+
+
+            try
+            {
+
+
+                System.Text.Encoding euckr = System.Text.Encoding.GetEncoding(51949);//euckr
+
+
+
+
+                HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument();
+
+                HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(p_url);
+
+                request.UserAgent = request.UserAgent;
+
+                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+
+
+
+
+                //초반 부분에서 charset확인
+
+                int len = 1024;
+
+                byte[] barr = new byte[len];
+
+                Stream stream = response.GetResponseStream();
+
+                int read_size = stream.Read(barr, 0, (int)len);
+
+                string data = Encoding.UTF8.GetString(barr);
+
+                var encod = doc.DetectEncodingHtml(data);
+
+
+
+
+                if (encod == null) encod = euckr;//default
+
+
+
+                //if (encod == null) encod = Encoding.UTF8;//default
+
+                //MessageBox.Show(encod.ToString());
+
+
+
+                //나머지 읽기
+
+                int total_size = read_size;
+
+                while (read_size > 0)
+                {
+
+                    byte[] barr2 = new byte[total_size * 2];
+
+                    for (int a = 0; a < total_size; a++) barr2[a] = barr[a];//복사
+
+                    read_size = stream.Read(barr, 0, total_size);
+
+                    for (int a = 0; a < read_size; a++) barr2[total_size + a] = barr[a];//복사
+
+                    total_size += read_size;
+
+                    barr = barr2;
+
+                }
+
+
+
+
+                response.Close();
+
+                string convstr = Encoding.Unicode.GetString(Encoding.Convert(encod, Encoding.Unicode, barr));
+
+
+                return convstr;
+            }
+            catch (Exception err)
+            {
+
+                //MessageBox.Show(err.ToString());
+
+                return "";
+
+            }
+
+            //doc.LoadHtml(convstr);
+
+        }
+
+        /*
+
+                public string get_html(string p_link, int p_index, string p_keyvalue)
+                {
+
+                    Encoding Lencode;
+                    string Lresult = "";
+                    string p_url = p_link;
+                    int Lindex = p_index;
+                    //MessageBox.Show(p_url);
+
+                    try
+                    {
+                        Uri Lsite = new Uri(p_url);
+                        WebRequest Lreq = (HttpWebRequest)WebRequest.Create(Lsite);
+                        HttpWebResponse Lres = (HttpWebResponse)Lreq.GetResponse();
+
+
+
+                        if (Lres.CharacterSet.ToLower() == "euc-kr")
+                        {
+
+                            Lencode = Encoding.GetEncoding(949);
+
+                        }
+                        else if (Lres.CharacterSet.ToLower() == "iso-8859-1")
+                        {    // 이부분만 문제가 된다. 
+
+                            Lencode = Encoding.GetEncoding(949);
+
+                        }
+                        else
+                        {
+                            Lencode = Encoding.UTF8;
+
+                        }
+
+                        StreamReader Lsr = new StreamReader(Lres.GetResponseStream(), Lencode, true);
+
+
+                        try
+                        {
+
+                            while (!Lsr.EndOfStream)
+                            {
+                                Lresult += Lsr.ReadLine();
+                                Lresult += "\r\n";
+                            }
+
+
+
+                            Lform.set_xml(Lresult.Trim());
+
+                        }
+                        catch (Exception err)
+                        {
+
+
+                        }
+
+                        Lres.Close();
+                    }
+                    catch (Exception err)
+                    {
+                        Lresult = "";
+                    }
+
+                    //MessageBox.Show(Lresult.Substring(1 ,1000));
+
+
+
+                    this.run_once(Lindex, p_keyvalue);
+
+                    return Lresult;
+
+
+                }
+
+        */
+
+        /*
+                public string get_html(string p_link , int p_index , string p_keyvalue)
+                {
+            
+                    Encoding Lencode;
+                    string Lresult = "";
+                    string p_url = p_link;
+                    int Lindex = p_index;
+                    //MessageBox.Show(p_url);
+
+                    try
+                    {
+                        Uri Lsite = new Uri(p_url);
+                        WebRequest Lreq = (HttpWebRequest)WebRequest.Create(Lsite);
+                        HttpWebResponse Lres = (HttpWebResponse)Lreq.GetResponse();
+
+
+
+                        if (Lres.CharacterSet.ToLower() == "euc-kr")
+                        {
+                    
+                            Lencode = Encoding.GetEncoding(949);
+
+                        }
+                        else if (Lres.CharacterSet.ToLower() == "iso-8859-1")
+                        {    // 이부분만 문제가 된다. 
+
+                            Lencode = Encoding.GetEncoding(949);
+
+                        }
+                        else
+                        {
+                            Lencode = Encoding.UTF8;
+
+                        }
+
+                        StreamReader Lsr = new StreamReader(Lres.GetResponseStream(), Lencode, true);
+
+
+                        try
+                        {
+
+                            while (!Lsr.EndOfStream)
+                            {
+                                Lresult += Lsr.ReadLine();
+                                Lresult += "\r\n";
+                            }
+
+
+
+                            Lform.set_xml(Lresult.Trim());
+
+                        }
+                        catch (Exception err)
+                        {
+
+
+                        }
+
+                        Lres.Close();
+                    }
+                    catch (Exception err)
+                    {
+                        Lresult = "";
+                    }
+
+                    //MessageBox.Show(Lresult.Substring(1 ,1000));
+
+            
+            
+                    //this.run_once(Lindex , p_keyvalue);
+
+                    return Lresult;
+
+
+                }
+                */
+
+        /*
+                                  while (!Lsr.EndOfStream)
+                                  {
+                                      Lresult += Lsr.ReadLine();
+                                      Lresult += "\r\n";
+                                  }
+                    
+
+                                  HtmlAgilityPack.HtmlWeb LLweb = new HtmlAgilityPack.HtmlWeb();
+
+                                  HtmlAgilityPack.HtmlDocument LLdoc = LLweb.Load(p_url);
+
+                                  //Unicode (UTF-8)
+                                  //한국어(EUC)
+                                  byte[] LLb;
+                                  string LLs = null;
+                                  Encoding LLencode;
+                                  if (LLdoc.Encoding.EncodingName == "Unicode (UTF-8)")
+                                  {
+                                      LLencode = Encoding.GetEncoding(949);
+                        
+                                  }
+                                  else
+                                  {
+                                      LLencode = Encoding.UTF8;
+                        
+
+                                  }
+
+
+                                      LLb = LLencode.GetBytes(LLdoc.DocumentNode.InnerText);
+                                      LLs = LLencode.GetString(LLb);
+
+                                  */
+
+        /*
+        Uri Lsite = new Uri(p_url);
+        WebRequest Lreq = (HttpWebRequest)WebRequest.Create(Lsite);
+        HttpWebResponse Lres = (HttpWebResponse)Lreq.GetResponse();
+
+
+
+        if (Lres.CharacterSet.ToLower() == "euc-kr")
+        {
+
+            Lencode = Encoding.GetEncoding(949);
+
+        }
+        else if (Lres.CharacterSet.ToLower() == "iso-8859-1")
+        {    // 이부분만 문제가 된다. 
+
+            Lencode = Encoding.GetEncoding(949);
+
+        }
+        else
+        {
+            Lencode = Encoding.UTF8;
+
+        }
+
+        StreamReader Lsr = new StreamReader(Lres.GetResponseStream(), Lencode, true);
+        */
+
+
+    }//end class Worker
+
+    public class Work
+    {
+
+
+        //------------------------------------
+
+        public string Lkeyword;
+        public string Lnegativeset;
+        public AM_CM_XML Lxml;
+
+        public int Lpagelength;
+        public int Lpagemaxnumber;
+
+        public int Lpagenumber_cursor = 1;
+        public int Lcurrent_pagenumber=1;
+
+        public am_f_main Lform;
+        public WorkManager Lworkmanager;
+        //------------------------------------
+
+
+        public const int Lmax = 10;
+
+        public Thread[] Lthread;
+        public Thread Lthread_main;
+        public Boolean Lnextcall;
+        public Boolean Lcomplete;
+        public WorkDataUnit Ldata;
+        public delegate void d_GET_Work_From_Naver(string p, int p2, int p3, string p_prefix);
+
+        public Work()
+        {
+            Lxml = new AM_CM_XML(null);
+
+            Lnextcall = false;
+            Lcomplete = false;
+
+        }//end function
+
+        public Work( WorkManager p_workmanager,  am_f_main p_form, string p_keyword, string p_negativeset, int p_pagelength, int p_maxpagenumber)
+        {
+
+            Lworkmanager = p_workmanager;
+            Lform = p_form;
+            Lkeyword = p_keyword;
+            Lnegativeset = p_negativeset;
+            Lpagelength = p_pagelength;
+            Lpagemaxnumber = p_maxpagenumber;
+
+            Lcurrent_pagenumber = 1;
+
+            Lxml = new AM_CM_XML(null);
+            Lthread = new Thread[p_maxpagenumber];
+
+
+        }//end function
+
+        public void Run_ThreadCaller()
+        {
+            try
+            {
+
+                
+                if (Lcurrent_pagenumber > Lpagemaxnumber)
+                {
+
+
+
+                    Lworkmanager.Run_ThreadCaller();
+                    return;
+                }
+
+
+                Thread Lthread = new Thread(
+                                                delegate()
+                                                {
+                                                    Run_ThreadCallee(
+                                                                        Lkeyword,
+                                                                        Lnegativeset,
+                                                                        Lcurrent_pagenumber++,
+                                                                        Lpagelength
+                                                                    );
+
+                                                }
+
+                                            );//end Thread
+
+                Lthread.Start();
+
+
+
+            }
+            catch (Exception err) { }
+
+
+        }//end LOAD_thread
+      
+        public void Run_ThreadCallee(string p_keyword, string p_negative, int p_pagenumber, int p_pagelength)
+        {
+
+            try
+            {
+
+                
+
+                // 자료를 네이버로부터 가져온다.
+                // 페이지당 하나의 LLxml 이 만들어지고 관리된다.
+
+                AM_CM_XML LLxml = new AM_CM_XML(null);
+
+                this.Load_Data(LLxml, p_keyword, p_negative, p_pagenumber, p_pagelength);
+
+                
+
+                // 자료를 처리할 쓰래드를 실행
+                if (LLxml.GET_Count() != 0)
+                {
+                    Worker LLworker = new Worker(this, LLxml);
+                    LLworker.run_ThreadCaller();
+
+                }
+                else
+                {
+                    
+                    // 더 분석 할 자료가 없음
+                    Lworkmanager.Run_ThreadCaller();
+
+                }
+
+            }
+            catch (Exception err) { }//end catch
+
+
+        }// end function
+
+        public void Load_Data(AM_CM_XML p_xml, string p_keyword, string p_negative, int p_pagenumber, int p_pagelength)
+        {
+
+            string Ltitle;
+            string Llink;
+
+            try
+            {
+
+                if (String.IsNullOrEmpty(p_keyword)) return;
+
+                Lform.SET_Msg2( " / " + p_pagenumber.ToString() + " / " + p_pagelength.ToString());
+
+                string LLurl = Class.OpenAPI_Naver.GET_URL_NaverRequest(p_keyword, p_pagenumber, p_pagelength, "news");
+
+                if (String.IsNullOrEmpty(LLurl)) return;
+
+                XmlTextReader LLxml = new XmlTextReader(LLurl);
+
+                XmlDocument LLdoc = new XmlDocument();
+
+                LLdoc.Load(LLxml);
+
+                if (String.IsNullOrEmpty(LLdoc.InnerXml)) return;
+
+
+                lock (p_xml)
+                {
+
+                    XmlNodeList LLnodes = LLdoc.GetElementsByTagName("item");
+                    foreach (XmlNode LLnode in LLnodes)
+                    {
+                        XmlElement LLe = (XmlElement)LLnode;
+
+                        Ltitle = LLe.GetElementsByTagName("title").Item(0).InnerText;
+                        Llink = LLe.GetElementsByTagName("originallink").Item(0).InnerText;
+
+
+                        //Lform.SET_Database( "//" + p_keyword +"//" + p_pagenumber.ToString() + "//" + p_pagelength.ToString() ,   Llink);
+
+                        p_xml.SET_Value(Llink, "title", Ltitle);
+                        p_xml.SET_Value(Llink, "link", Llink);
+                        p_xml.SET_Value(Llink, "keyword", p_keyword);
+                        p_xml.SET_Value(Llink, "negative", p_negative);
+
+                    }// end foreach
+
+                }//end lock
+
+            }
+            catch (Exception err) {
+
+                MessageBox.Show(err.ToString());
+            }//end catch
+
+
+        }// end function
+
+
+
+
+
+        public void LOAD_Data_ThreadCaller(string p_keyword, string p_negative, int p_pagelength)
+        {
+            try
+            {
+
+                for (int i = 0; i < Lmax; i++)
+                {
+
+                    Lthread[i] = new Thread(
+                                            delegate()
+                                            {
+                                                LOAD_Data_thread(p_keyword, p_negative, (i + 1), p_pagelength);
+                                            }
+
+                                            );//end Thread
+
+                    Lthread[i].Start();
+
+
+                }
+            }
+            catch (Exception err) { }
+
+
+        }//end LOAD_thread
+
+        public void LOAD_Data_Thread(string p_keyword, string p_negative, int p_pagelength)
+        {
+            try
+            {
+
+                for (int i = 0; i < Lmax; i++)
+                {
+
+
+                    Lthread[i] = new Thread(delegate()
+                    {
+
+                        LOAD_Data_thread(p_keyword, p_negative, (i + 1), p_pagelength);
+
+                    }
+                                            ); //end Thread
+
+                    Lthread[i].Start();
+
+
+                }
+            }
+            catch (Exception err) { }
+
+
+        }//end LOAD_thread
+
+        public void LOAD_Data_thread(string p_keyword, string p_negative, int p_pagenumber, int p_pagelength)
+        {
+
+            try
+            {
+                int LLkey;
+
+                if (String.IsNullOrEmpty(p_keyword)) return;
+
+                if (p_pagenumber > 2) p_pagenumber = p_pagenumber * 10;
+
+                string LLurl = Class.OpenAPI_Naver.GET_URL_NaverRequest(p_keyword, p_pagenumber, p_pagelength, "news");
+
+                if (String.IsNullOrEmpty(LLurl)) return;
+
+                XmlTextReader LLxml = new XmlTextReader(LLurl);
+
+                XmlDocument LLdoc = new XmlDocument();
+
+                LLdoc.Load(LLxml);
+
+                if (String.IsNullOrEmpty(LLdoc.InnerXml)) return;
+
+
+                lock (Lxml)
+                {
+
+                    XmlNodeList LLnodes = LLdoc.GetElementsByTagName("item");
+                    foreach (XmlNode LLnode in LLnodes)
+                    {
+                        XmlElement LLe = (XmlElement)LLnode;
+
+                        LLkey = Lxml.GET_Count() + 1;
+
+                        Ldata.Ltitle = LLe.GetElementsByTagName("title").Item(0).InnerText;
+                        Ldata.Llink = LLe.GetElementsByTagName("originallink").Item(0).InnerText;
+                        Ldata.Lkeyword = p_keyword;
+                        Ldata.Lnegative = p_negative;
+
+                        Lxml.SET_Value((LLkey).ToString(), "title", Ldata.Ltitle);
+                        Lxml.SET_Value((LLkey).ToString(), "link", Ldata.Llink);
+                        Lxml.SET_Value((LLkey).ToString(), "keyword", p_keyword);
+                        Lxml.SET_Value((LLkey).ToString(), "negative", p_negative);
+
+                    }// end foreach
+
+                }//end lock
+
+
+            }//end try
+            catch (Exception err)
+            {
+
+                //MessageBox.Show(err.ToString());
+            }
+        }// end function
+
+        public AM_CM_XML GET_XML()
+        {
+            return this.Lxml;
+        }
+
+        public WorkDataUnit GET_Value(Boolean p_is_first = false)
+        {
+            if (p_is_first) Lxml.moveFirst();
+
+            WorkDataUnit LLdata = new WorkDataUnit();
+
+            LLdata.Ltitle = Lxml.GET_Value_Attribute_Cursor("title");
+            LLdata.Llink = Lxml.GET_Value_Attribute_Cursor("link");
+            LLdata.Lkeyword = Lxml.GET_Value_Attribute_Cursor("keyword");
+            LLdata.Lnegative = Lxml.GET_Value_Attribute_Cursor("negative");
+
+            Lxml.moveNext();
+
+            return LLdata;
+
+        }//end function
+
+        public Boolean is_Complete()
+        {
+
+
+            for (int i = 0; i < Lmax; i++)
+            {
+                if (Lthread[i].IsAlive) return false;
+
+            }
+
+            return true;
+        }
+
+        public Boolean EOF()
+        {
+            return Lxml.EOF();
+
+        }
+
+        public void Seach(am_f_main p_form)
+        {
+
+
+        }
+
+        public void Searching(am_f_main p_form)
+        {
+            try
+            {
+
+                while (Lxml.GET_Count() < 300)
+                {
+                    Thread.Sleep(10);
+
+                }
+
+                //p_form.set_xml( "",  "",  Lxml.GET_XML(), "");
+            }
+            catch (Exception err) { }
+
+
+        }
+
+        public void Getting(string p_keyword)
+        {
+            //d_GET_Work_From_Naver d_get_naver = new d_GET_Work_From_Naver(GET_Work_From_Naver);
+
+
+
+            try
+            {
+
+                for (int i = 0; i < 10; i++)
+                {
+
+
+                    Lthread[i] = new Thread(delegate()
+                    {
+
+                        GET_Work_From_Naver(p_keyword, i, 30, "head_" + i.ToString() + "_");
+
+                    }
+
+                                             );
+
+                    Lthread[i].Start();
+
+                }
+            }
+            catch (Exception err) { }
+
+
+        }
+
+        public void GET_Work_From_Naver(string p_keyword, int p_pagenumber, int p_pagelength, string p_prefix = "")
+        {
+
+            try
+            {
+                int LLkey;
+
+                if (String.IsNullOrEmpty(p_keyword))
+                {
+                    MessageBox.Show("키워드를 입력하세요.");
+                    return;
+                }
+
+
+
+                string LLurl = Class.OpenAPI_Naver.GET_URL_NaverRequest(p_keyword, p_pagenumber, p_pagelength, "news");
+
+                XmlTextReader LLxml = new XmlTextReader(LLurl);
+
+                XmlDocument LLdoc = new XmlDocument();
+
+
+
+                LLdoc.Load(LLxml);
+
+
+                lock (Lxml)
+                {
+
+                    XmlNodeList LLnodes = LLdoc.GetElementsByTagName("item");
+                    foreach (XmlNode LLnode in LLnodes)
+                    {
+                        XmlElement LLe = (XmlElement)LLnode;
+
+                        LLkey = Lxml.GET_Count() + 1;
+
+                        Lxml.SET_Value(p_prefix + (LLkey).ToString(), "title", LLe.GetElementsByTagName("title").Item(0).InnerText);
+                        Lxml.SET_Value(p_prefix + (LLkey).ToString(), "link", LLe.GetElementsByTagName("originallink").Item(0).InnerText);
+                        Lxml.SET_Value(p_prefix + (LLkey).ToString(), "status", "ready");
+
+                    }// end foreach
+
+                }//end lock
+
+                //MessageBox.Show(Lxml.GET_Count().ToString());
+            }
+            catch (Exception err) { }
+        }// end function
+
+        /*
+              public void Run_ThreadCaller2(AM_CM_XML p_xml)
+              {
+                  try
+                  {
+
+
+                      p_xml.moveFirst();
+
+
+
+
+                  }
+                  catch (Exception err)
+                  {
+
+                      MessageBox.Show(err.ToString());
+
+                  }
+
+
+              }//end LOAD_thread
+              */
+
+    }//end class
+
+    public class WorkManager
+    {
+
+        public string Lkeywordset;
+        public string Lnegativeset;
+
+        public string[] Larr_keywordset;
+        public string[] Larr_negativeset;
+
+        public Work[] Lwork;
+        public int Lmax_work;
+
+        public int Lcursor = 0;
+        public int Lpagelength;
+        public int Lmaxpagenumber;
+
+        am_f_main Lform;
+
+        public WorkManager(am_f_main p_form, string p_keywordset, string p_negativeset, int p_pagelength, int p_maxpagenumber)
+        {
+
+            Lform = p_form;
+
+            string[] Larr_keywordset = p_keywordset.Split(new char[] { ',' });
+            string[] Larr_negativeset = p_negativeset.Split(new char[] { ',' });
+
+            Lmax_work = Larr_keywordset.Length;
+            Lpagelength = p_pagelength;
+            Lmaxpagenumber = p_maxpagenumber;
+
+
+
+            Lwork = new Work[Lmax_work];
+
+            for (int LLi = 0; LLi < Lmax_work; LLi++)
+                Lwork[LLi] = new Work( this , Lform, Larr_keywordset[LLi], p_negativeset, p_pagelength, p_maxpagenumber);
+
+
+        }//end function 생성자
+
+        public void Run_ThreadCaller()
+        {
+            
+
+            if (Lcursor < Lmax_work)
+            {
+             
+                Thread Lthread = new Thread(
+
+                                            delegate()
+                                                        {
+                                                            Run_ThreadCallee(Lcursor++);
+                                                        }
+
+                ); // end Thread
+                Lthread.Start();
+            }
+            else
+            {
+                //MessageBox.Show("종료---현재커서 : " + Lcursor.ToString() + Environment.NewLine + "맥스:" + Lmax_work.ToString());
+                
+
+            }
+        }//end function - Run
+
+        public void Run_ThreadCallee( int p_worknumber )
+        {
+
+            Lwork[p_worknumber].Run_ThreadCaller(); //for (int LLi = 0; LLi < Lmax_work; LLi++)
+
+        }
+
+
+
+
+
+
+    }//end class
+
+
+}//end namespace
