@@ -1,0 +1,8 @@
+[ODBC]
+DRIVER=SQL Server
+UID=soshi
+DATABASE=Circulatory
+WSID=DESKTOP-SHGBCN3
+APP=Microsoft Office 2016
+Trusted_Connection=Yes
+SERVER=192.168.0.42,1432
