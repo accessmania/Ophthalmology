@@ -88,4 +88,37 @@ agx6bcw6
 환자번호
 a4지
 
+-------------------------
+<선택>
+<선택/>
+<select>
+<select/>
+<c>
+<c/>
+<n>
+<n/>
+<polar>
+<polar/>
+<asc>
+<asc/>
+<psc>
+<psc/>
+<memo>
+<memo/>
+<메모>
+<메모/>
+<diagnosis>
+<diagnosis/>
+<진단명>
+<진단명/>
+
+
+
+
+
+
+
+
+
+
 
